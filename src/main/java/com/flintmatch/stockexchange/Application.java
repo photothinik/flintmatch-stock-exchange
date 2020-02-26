@@ -6,7 +6,7 @@ public class Application {
 
     public static void main(String[] args) {
 
-        new StockExchangeController();
+        new Thread(new StockExchangeController()).start();
 
     }
 
