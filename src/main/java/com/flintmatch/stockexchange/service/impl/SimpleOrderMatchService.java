@@ -5,8 +5,10 @@ import com.flintmatch.stockexchange.model.OrderType;
 import com.flintmatch.stockexchange.repository.OrderRepository;
 import com.flintmatch.stockexchange.service.OrderMatchException;
 import com.flintmatch.stockexchange.service.OrderMatchService;
+import com.flintmatch.stockexchange.service.UnableToFulfillException;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 public class SimpleOrderMatchService implements OrderMatchService {
@@ -18,31 +20,62 @@ public class SimpleOrderMatchService implements OrderMatchService {
     }
 
     public List<Order> searchBuyers(Order sellerOrder) throws OrderMatchException {
-        throw new OrderMatchException("Not implemented");
-    }
 
-    public List<Order> searchSellers(Order buyerOrder) throws OrderMatchException {
-        throw new OrderMatchException("Not implemented");
-    }
+        // Buyers looking for the same stock symbol, and that are available
 
-    public void fulfillTrade(Order buyer, Order Seller) throws OrderMatchException {
-        throw new OrderMatchException("Not implemented");
-    }
+        List<Order> resultPotentialBuyers = new ArrayList<Order>();
 
-    public List<Order> getBuyers() throws OrderMatchException {
         try {
-            Order filter = new Order(null, null, OrderType.BUY, null, null);
-            return this.orderRepository.selectOrders(filter);
+
+            // Get all buyers
+
+            // Filter
+            Order buyerFilter = new Order();
+            buyerFilter.setOrderType(OrderType.BUY);
+
+            // Fetch
+            List<Order> allBuyOrders = this.orderRepository.selectOrders(buyerFilter);
+
+            // Check each buyer
+            for(Order buyer : allBuyOrders) {
+
+                if( buyer.getFulfilled() != null && buyer.getFulfilled().booleanValue())
+                    continue;
+                if( buyer.getConfirmed() != null && buyer.getConfirmed().booleanValue())
+                    continue;
+                if( buyer.getStockSymbol() == null || !buyer.getStockSymbol().equalsIgnoreCase(sellerOrder.getStockSymbol()))
+                    continue;
+
+                resultPotentialBuyers.add(buyer);
+
+            }
+
+
         } catch (SQLException e) {
-            throw new OrderMatchException("Unable to search buyers: " + e.getMessage(), e);
+            throw new OrderMatchException("Searching for buyers failed: " + e.getMessage(), e);
         }
 
+        return resultPotentialBuyers;
+
+    }
+
+    public void fulfillTrade(Order buyer, Order Seller) throws UnableToFulfillException {
+
+
+
+        throw new UnableToFulfillException("Not implemented");
     }
 
     public List<Order> getSellers() throws OrderMatchException {
         try {
-            Order filter = new Order(null, null, OrderType.SELL, null, null);
+
+            // Create filter
+            Order filter = new Order();
+            filter.setOrderType(OrderType.SELL);
+
+            // Run query
             return this.orderRepository.selectOrders(filter);
+
         } catch (SQLException e) {
             throw new OrderMatchException("Unable to search sellers: " + e.getMessage(), e);
         }

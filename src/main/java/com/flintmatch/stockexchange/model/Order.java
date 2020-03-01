@@ -7,8 +7,11 @@ public class Order {
     private OrderType orderType;
     private String stockSymbol;
     private Integer quantity;
-    private boolean fulfilled = false;
-    private boolean confirmed = false;
+    private Boolean fulfilled;
+    private Boolean confirmed;
+
+    public Order() {
+    }
 
     public Order(Long id, Long traderId, OrderType orderType, String stockSymbol, Integer quantity) {
         this.id = id;
@@ -16,6 +19,16 @@ public class Order {
         this.orderType = orderType;
         this.stockSymbol = stockSymbol;
         this.quantity = quantity;
+    }
+
+    public Order(Long id, Long traderId, OrderType orderType, String stockSymbol, Integer quantity, Boolean fulfilled, Boolean confirmed) {
+        this.id = id;
+        this.traderId = traderId;
+        this.orderType = orderType;
+        this.stockSymbol = stockSymbol;
+        this.quantity = quantity;
+        this.fulfilled = fulfilled;
+        this.confirmed = confirmed;
     }
 
     public Long getId() {
@@ -58,19 +71,19 @@ public class Order {
         this.quantity = quantity;
     }
 
-    public boolean isFulfilled() {
+    public Boolean getFulfilled() {
         return fulfilled;
     }
 
-    public void setFulfilled(boolean fulfilled) {
+    public void setFulfilled(Boolean fulfilled) {
         this.fulfilled = fulfilled;
     }
 
-    public boolean isConfirmed() {
+    public Boolean getConfirmed() {
         return confirmed;
     }
 
-    public void setConfirmed(boolean confirmed) {
+    public void setConfirmed(Boolean confirmed) {
         this.confirmed = confirmed;
     }
 }
