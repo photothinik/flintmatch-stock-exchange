@@ -6,29 +6,27 @@ public class Order {
     private Long traderId;
     private OrderType orderType;
     private String stockSymbol;
-    private Integer quantity;
-    private Boolean fulfilled;
-    private Boolean confirmed;
+    private Integer totalQuantity;
+    private boolean fulfilled = false;
 
     public Order() {
     }
 
-    public Order(Long id, Long traderId, OrderType orderType, String stockSymbol, Integer quantity) {
+    public Order(Long id, Long traderId, OrderType orderType, String stockSymbol, Integer totalQuantity) {
         this.id = id;
         this.traderId = traderId;
         this.orderType = orderType;
         this.stockSymbol = stockSymbol;
-        this.quantity = quantity;
+        this.totalQuantity = totalQuantity;
     }
 
-    public Order(Long id, Long traderId, OrderType orderType, String stockSymbol, Integer quantity, Boolean fulfilled, Boolean confirmed) {
+    public Order(Long id, Long traderId, OrderType orderType, String stockSymbol, Integer totalQuantity, boolean fulfilled) {
         this.id = id;
         this.traderId = traderId;
         this.orderType = orderType;
         this.stockSymbol = stockSymbol;
-        this.quantity = quantity;
+        this.totalQuantity = totalQuantity;
         this.fulfilled = fulfilled;
-        this.confirmed = confirmed;
     }
 
     public Long getId() {
@@ -63,27 +61,19 @@ public class Order {
         this.stockSymbol = stockSymbol;
     }
 
-    public Integer getQuantity() {
-        return quantity;
-    }
-
-    public void setQuantity(Integer quantity) {
-        this.quantity = quantity;
-    }
-
-    public Boolean getFulfilled() {
+    public boolean isFulfilled() {
         return fulfilled;
     }
 
-    public void setFulfilled(Boolean fulfilled) {
+    public void setFulfilled(boolean fulfilled) {
         this.fulfilled = fulfilled;
     }
 
-    public Boolean getConfirmed() {
-        return confirmed;
+    public Integer getTotalQuantity() {
+        return totalQuantity;
     }
 
-    public void setConfirmed(Boolean confirmed) {
-        this.confirmed = confirmed;
+    public void setTotalQuantity(Integer totalQuantity) {
+        this.totalQuantity = totalQuantity;
     }
 }

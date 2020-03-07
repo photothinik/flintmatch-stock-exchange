@@ -3,6 +3,7 @@ package com.flintmatch.stockexchange.repository.impl;
 import com.flintmatch.stockexchange.model.Order;
 import com.flintmatch.stockexchange.model.OrderType;
 import com.flintmatch.stockexchange.repository.OrderRepository;
+import com.flintmatch.stockexchange.repository.OrderRepositoryOrderFilter;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.ResultSetExtractor;
@@ -14,7 +15,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SqlPostgresOrderRepository implements OrderRepository {
+public class SqlPostgresOrderRepositoryImpl implements OrderRepository {
 
     private DataSource dataSource;
 
@@ -26,7 +27,7 @@ public class SqlPostgresOrderRepository implements OrderRepository {
         return selectOrders(null);
     }
 
-    public List<Order> selectOrders(Order filter) throws SQLException {
+    public List<Order> selectOrders(OrderRepositoryOrderFilter filter) throws SQLException {
 
         JdbcTemplate select = new JdbcTemplate(this.dataSource);
 
@@ -68,18 +69,13 @@ public class SqlPostgresOrderRepository implements OrderRepository {
                 sqlParams.add(filter.getFulfilled() ? "Y" : "N");
             }
 
-            if (filter.getConfirmed() != null) {
-                sqlConditions.add("confirmed=?");
-                sqlParams.add(filter.getConfirmed() ? "Y" : "N");
-            }
-
         }
 
         // **********************************
         // Create query
         // **********************************
 
-        StringBuffer sql = new StringBuffer("select * from order_transaction");
+        StringBuffer sql = new StringBuffer("select * from stock_order");
 
         if( sqlConditions.size() > 0) {
             sql.append(" where ");
@@ -105,16 +101,14 @@ public class SqlPostgresOrderRepository implements OrderRepository {
             throw new NullPointerException("Unable to create order because the value passed was null");
 
         JdbcTemplate insert = new JdbcTemplate(this.dataSource);
-        insert.update("insert into order_transaction " +
-                        "(trader_id, order_type, stock_symbol, quantity, fulfilled, confirmed) values " +
+        insert.update("insert into stock_order " +
+                        "(trader_id, order_type, stock_symbol, total_quantity) values " +
                         "(?,?,?,?,?,?)",
                 new Object[] {
                         o.getTraderId(),
                         o.getOrderType().getRepositoryCode(),
                         o.getStockSymbol(),
-                        o.getQuantity(),
-                        (o.getFulfilled() != null && o.getFulfilled().booleanValue() ? "Y" : "N"),
-                        (o.getFulfilled() != null && o.getConfirmed().booleanValue() ? "Y" : "N")
+                        o.getTotalQuantity()
                 });
     }
 
@@ -126,21 +120,19 @@ public class SqlPostgresOrderRepository implements OrderRepository {
 
         JdbcTemplate update = new JdbcTemplate(this.dataSource);
         update.update(
-                "update order_transaction set " +
+                "update stock_order set " +
                         "trader_id=?, " +
                         "order_type=?, " +
                         "stock_symbol=?, " +
-                        "quantity=?, " +
+                        "total_quantity=?, " +
                         "fulfilled=?, " +
-                        "comfirmed=? " +
                         "where id=?",
                 new Object[] {
                         o.getTraderId(),
                         o.getOrderType(),
                         o.getStockSymbol(),
-                        o.getQuantity(),
-                        (o.getFulfilled() != null && o.getFulfilled().booleanValue() ? "Y" : "N"),
-                        (o.getConfirmed() != null && o.getConfirmed().booleanValue() ? "Y" : "N"),
+                        o.getTotalQuantity(),
+                        (o.isFulfilled() ? "Y" : "N"),
                         o.getId()
                 }
         );
@@ -154,7 +146,7 @@ public class SqlPostgresOrderRepository implements OrderRepository {
 
         JdbcTemplate delete = new JdbcTemplate(this.dataSource);
         delete.update(
-                "delete * from order_transaction where id=?",
+                "delete * from stock_order where id=?",
                 new Object[] {o.getId()}
         );
     }
@@ -174,9 +166,8 @@ public class SqlPostgresOrderRepository implements OrderRepository {
                     resultSet.getLong("trader_id"),
                     OrderType.forRepositoryCode(resultSet.getString("order_type")),
                     resultSet.getString("stock_symbol"),
-                    resultSet.getInt("quantity"),
-                    ("Y".equalsIgnoreCase(resultSet.getString("fulfilled")) ? Boolean.TRUE : Boolean.FALSE),
-                    ("Y".equalsIgnoreCase(resultSet.getString("confirmed")) ? Boolean.TRUE : Boolean.FALSE)
+                    resultSet.getInt("total_quantity"),
+                    ("Y".equalsIgnoreCase(resultSet.getString("fulfilled")) ? Boolean.TRUE : Boolean.FALSE)
             );
         }
     }

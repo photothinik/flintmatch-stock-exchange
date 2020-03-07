@@ -5,7 +5,7 @@ import com.flintmatch.stockexchange.config.ApplicationProperty;
 import com.flintmatch.stockexchange.config.ApplicationVersion;
 import com.flintmatch.stockexchange.model.Order;
 import com.flintmatch.stockexchange.repository.OrderRepository;
-import com.flintmatch.stockexchange.repository.impl.SqlPostgresOrderRepository;
+import com.flintmatch.stockexchange.repository.impl.SqlPostgresOrderRepositoryImpl;
 import com.flintmatch.stockexchange.service.OrderMatchException;
 import com.flintmatch.stockexchange.service.OrderMatchService;
 import com.flintmatch.stockexchange.service.UnableToFulfillException;
@@ -62,7 +62,7 @@ public class StockExchangeController implements Runnable {
 
         // Repos
         logger.info("Configuring respositories");
-        this.orderRepository = new SqlPostgresOrderRepository();
+        this.orderRepository = new SqlPostgresOrderRepositoryImpl();
         this.orderRepository.setDataSource(dataSource);
 
 
@@ -82,36 +82,40 @@ public class StockExchangeController implements Runnable {
                 // For each sell order, search for buyers
                 for(Order sellOrder : sellOrders) {
 
-                    if( sellOrder.getFulfilled() == null)
-                    {
-                        logger.warn("Sell order '" +
-                                Helper.getHumanReadableDescription(sellOrder) +
-                                "' had invalid fulfilled state: skipping evaluation");
-                        continue;
-                    }
+                    // Get the
 
                     // Get all potential buyers
                     List<Order> potentialBuyers = this.orderMatchService.searchBuyers(sellOrder);
                     logger.info("Found {} potential buyer(s) for sell order {}", potentialBuyers.size(), Helper.getHumanReadableDescription(sellOrder));
 
-                    // For each potential buyer, try to set a tentative fulfillment
+
+                    /* ++++++++++++++++++ RESERVATION PHASE +++++++++++++++++++ */
+
+                    // For each potential buyer, try to reserve
                     for(Order potentialBuyer : potentialBuyers) {
 
-                        // Only continue searching if the seller is not already fulfilled
-                        if( sellOrder.getFulfilled().booleanValue())
+                        // Here we check all buyer reservations to see if the seller's request is complete
+
+                        // Only continue searching if the seller still needs more buyers
+                        if( sellOrder.isFulfilled() ?)
                             break;
 
-                        // Try to fulfill
+                        // Try to reserve
                         try {
-                            this.orderMatchService.fulfillTrade(potentialBuyer, sellOrder);
-                            logger.info("Buy order {} successfully matched to sell order {}", Helper.getHumanReadableDescription(potentialBuyer), Helper.getHumanReadableDescription(sellOrder));
+                            this.orderMatchService.reserve(potentialBuyer, sellOrder);
+                            logger.info("Buy order {} successfully reserved with sell order {}", Helper.getHumanReadableDescription(potentialBuyer), Helper.getHumanReadableDescription(sellOrder));
                         } catch(UnableToFulfillException e) {
                             // Fulfillment failed, go on to next potential buyer
-                            logger.info("Buy order {} unable to be matched: {}", Helper.getHumanReadableDescription(potentialBuyer), e.getMessage());
+                            logger.info("Buy order {} unable to be reserved: {}", Helper.getHumanReadableDescription(potentialBuyer), e.getMessage());
                         }
 
 
                     }
+
+
+                    /* ++++++++++++++++++ COMMIT PHASE +++++++++++++++++++ */
+
+                    // TODO
 
 
                 }

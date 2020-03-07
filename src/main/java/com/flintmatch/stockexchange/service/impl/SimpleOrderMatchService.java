@@ -3,6 +3,7 @@ package com.flintmatch.stockexchange.service.impl;
 import com.flintmatch.stockexchange.model.Order;
 import com.flintmatch.stockexchange.model.OrderType;
 import com.flintmatch.stockexchange.repository.OrderRepository;
+import com.flintmatch.stockexchange.repository.OrderRepositoryOrderFilter;
 import com.flintmatch.stockexchange.service.OrderMatchException;
 import com.flintmatch.stockexchange.service.OrderMatchService;
 import com.flintmatch.stockexchange.service.UnableToFulfillException;
@@ -30,7 +31,7 @@ public class SimpleOrderMatchService implements OrderMatchService {
             // Get all buyers
 
             // Filter
-            Order buyerFilter = new Order();
+            OrderRepositoryOrderFilter buyerFilter = new OrderRepositoryOrderFilter();
             buyerFilter.setOrderType(OrderType.BUY);
 
             // Fetch
@@ -39,9 +40,7 @@ public class SimpleOrderMatchService implements OrderMatchService {
             // Check each buyer
             for(Order buyer : allBuyOrders) {
 
-                if( buyer.getFulfilled() != null && buyer.getFulfilled().booleanValue())
-                    continue;
-                if( buyer.getConfirmed() != null && buyer.getConfirmed().booleanValue())
+                if( buyer.isReserved())
                     continue;
                 if( buyer.getStockSymbol() == null || !buyer.getStockSymbol().equalsIgnoreCase(sellerOrder.getStockSymbol()))
                     continue;
@@ -59,7 +58,7 @@ public class SimpleOrderMatchService implements OrderMatchService {
 
     }
 
-    public void fulfillTrade(Order buyer, Order Seller) throws UnableToFulfillException {
+    public void reserve(Order buyer, Order Seller) throws UnableToFulfillException {
 
 
 
@@ -70,7 +69,7 @@ public class SimpleOrderMatchService implements OrderMatchService {
         try {
 
             // Create filter
-            Order filter = new Order();
+            OrderRepositoryOrderFilter filter = new OrderRepositoryOrderFilter();
             filter.setOrderType(OrderType.SELL);
 
             // Run query

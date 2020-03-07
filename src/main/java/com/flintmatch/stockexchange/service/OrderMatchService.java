@@ -10,6 +10,6 @@ public interface OrderMatchService {
 
     List<Order> searchBuyers(Order sellerOrder) throws OrderMatchException;
 
-    void fulfillTrade(Order buyer, Order Seller) throws UnableToFulfillException;
+    void reserve(Order buyer, Order Seller) throws UnableToFulfillException;
 
 }

@@ -12,7 +12,7 @@ public interface OrderRepository {
 
     List<Order> selectOrders() throws SQLException;
 
-    List<Order> selectOrders(Order filter) throws SQLException;
+    List<Order> selectOrders(OrderRepositoryOrderFilter filter) throws SQLException;
 
     void createOrder(Order o) throws SQLException;
 
