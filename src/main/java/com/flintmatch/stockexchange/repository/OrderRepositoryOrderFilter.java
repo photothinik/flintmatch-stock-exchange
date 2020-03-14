@@ -8,18 +8,18 @@ public class OrderRepositoryOrderFilter {
     private Long traderId;
     private OrderType orderType;
     private String stockSymbol;
-    private Integer quantity;
+    private Integer totalQuantity;
     private Boolean fulfilled;
 
     public OrderRepositoryOrderFilter() {
     }
 
-    public OrderRepositoryOrderFilter(Long id, Long traderId, OrderType orderType, String stockSymbol, Integer quantity, Boolean fulfilled) {
+    public OrderRepositoryOrderFilter(Long id, Long traderId, OrderType orderType, String stockSymbol, Integer totalQuantity, Boolean fulfilled) {
         this.id = id;
         this.traderId = traderId;
         this.orderType = orderType;
         this.stockSymbol = stockSymbol;
-        this.quantity = quantity;
+        this.totalQuantity = totalQuantity;
         this.fulfilled = fulfilled;
     }
 
@@ -55,19 +55,19 @@ public class OrderRepositoryOrderFilter {
         this.stockSymbol = stockSymbol;
     }
 
-    public Integer getQuantity() {
-        return quantity;
-    }
-
-    public void setQuantity(Integer quantity) {
-        this.quantity = quantity;
-    }
-
     public Boolean getFulfilled() {
         return fulfilled;
     }
 
     public void setFulfilled(Boolean fulfilled) {
         this.fulfilled = fulfilled;
+    }
+
+    public Integer getTotalQuantity() {
+        return totalQuantity;
+    }
+
+    public void setTotalQuantity(Integer totalQuantity) {
+        this.totalQuantity = totalQuantity;
     }
 }

@@ -59,9 +59,9 @@ public class SqlPostgresOrderRepositoryImpl implements OrderRepository {
                 sqlParams.add(filter.getStockSymbol());
             }
 
-            if (filter.getQuantity() != null) {
-                sqlConditions.add("quantity=?");
-                sqlParams.add(filter.getQuantity());
+            if (filter.getTotalQuantity() != null) {
+                sqlConditions.add("total_quantity=?");
+                sqlParams.add(filter.getTotalQuantity());
             }
 
             if (filter.getFulfilled() != null) {
@@ -125,11 +125,11 @@ public class SqlPostgresOrderRepositoryImpl implements OrderRepository {
                         "order_type=?, " +
                         "stock_symbol=?, " +
                         "total_quantity=?, " +
-                        "fulfilled=?, " +
+                        "fulfilled=? " +
                         "where id=?",
                 new Object[] {
                         o.getTraderId(),
-                        o.getOrderType(),
+                        o.getOrderType().getRepositoryCode(),
                         o.getStockSymbol(),
                         o.getTotalQuantity(),
                         (o.isFulfilled() ? "Y" : "N"),
