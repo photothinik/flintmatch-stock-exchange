@@ -92,7 +92,7 @@ public class StockExchangeController implements Runnable {
 
                     // Get all potential buyers
                     List<Order> potentialBuyers = this.orderMatchService.searchBuyers(sellOrder);
-                    logger.info("Found {} potential buyer(s) for sell order {}", potentialBuyers.size(), Helper.getHumanReadableDescription(sellOrder));
+                    logger.debug("Found {} potential buyer(s) for sell order {}", potentialBuyers.size(), Helper.getHumanReadableDescription(sellOrder));
 
 
                     /* ++++++++++++++++++ RESERVATION PHASE +++++++++++++++++++ */
